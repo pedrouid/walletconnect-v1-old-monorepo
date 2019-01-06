@@ -1,13 +1,19 @@
 {
   "compilerOptions": {
-    "module": "ES2015",
+    "baseUrl": ".",
+    "module": "commonjs",
     "target": "es5",
-    "lib": ["es6", "es7", "dom"],
+    "lib": ["es2017", "dom"],
     "strict": true,
+    "composite": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
+    "downlevelIteration": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
     "noImplicitAny": true,
@@ -16,5 +22,21 @@
     "suppressImplicitAnyIndexErrors": true,
     "noUnusedLocals": true,
     "resolveJsonModule": true
-  }
+    // "paths": {
+    //   "walletconnect-core": ["./packages/walletconnect-core/src"],
+    //   "walletconnect": ["./packages/walletconnect/src"],
+    //   "walletconnect-web3-subprovider": [
+    //     "./packages/walletconnect-web3-subprovider/src"
+    //   ]
+    // }
+  },
+  "include": [],
+  "references": [
+    { "path": "./packages/walletconnect" },
+    { "path": "./packages/walletconnect-core" },
+    { "path": "./packages/walletconnect-react-native" },
+    { "path": "./packages/walletconnect-qrcode-modal" },
+    { "path": "./packages/walletconnect-web3-subprovider" },
+    { "path": "./packages/walletconnect-web3-provider" }
+  ]
 }
