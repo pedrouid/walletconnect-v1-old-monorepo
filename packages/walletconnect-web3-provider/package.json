@@ -3,7 +3,7 @@
   "version": "1.0.0-beta",
   "description": "Web3 Provider for WalletConnect",
   "scripts": {
-    "clean": "rm -rf dist",
+    "clean": "rm -rf lib",
     "build": "webpack --config webpack.config.js",
     "test": "BABEL_ENV=test mocha --require @babel/register --require @babel/polyfill --require isomorphic-fetch --colors test/**/*.spec.js",
     "test:watch": "npm run test -- -w"
@@ -18,13 +18,13 @@
   "author": "WalletConnect <walletconnect.org>",
   "homepage": "https://walletconnect.org",
   "license": "LGPL-3.0",
-  "main": "dist/walletconnect-web3-provider.js",
+  "main": "lib/index.js",
   "directories": {
-    "lib": "dist",
+    "lib": "lib",
     "test": "test"
   },
   "files": [
-    "dist",
+    "lib",
     "src"
   ],
   "repository": {

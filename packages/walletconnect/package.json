@@ -1,9 +1,9 @@
 {
   "name": "walletconnect",
   "version": "1.0.0-beta",
-  "description": "Walletconnect library for browser",
+  "description": "Browser SDK for WalletConnect",
   "scripts": {
-    "clean": "rm -rf dist",
+    "clean": "rm -rf lib",
     "build": "webpack --config webpack.config.js",
     "test": "BABEL_ENV=test mocha --require @babel/register --require @babel/polyfill --require isomorphic-fetch --require mock-local-storage --colors test/**/*.spec.js",
     "test:watch": "npm run test -- -w"
@@ -17,13 +17,13 @@
   "author": "WalletConnect <walletconnect.org>",
   "homepage": "https://walletconnect.org",
   "license": "LGPL-3.0",
-  "main": "dist/walletconnect.js",
+  "main": "lib/index.js",
   "directories": {
-    "lib": "dist",
+    "lib": "lib",
     "test": "test"
   },
   "files": [
-    "dist",
+    "lib",
     "src"
   ],
   "repository": {
