@@ -43,9 +43,10 @@
     "@babel/preset-typescript": "^7.1.0",
     "@babel/register": "^7.0.0",
     "@types/base64-js": "^1.2.5",
-    "@types/node": "^10.12.15",
     "@types/chai": "^4.1.6",
     "@types/mocha": "^5.2.5",
+    "@types/node": "^10.12.15",
+    "@types/react-native": "^0.57.25",
     "chai": "^4.1.2",
     "isomorphic-fetch": "^2.2.1",
     "mocha": "5.2.0",
@@ -53,9 +54,9 @@
   },
   "dependencies": {
     "base64-js": "^1.3.0",
+    "react-native": "^0.57.7",
     "react-native-fast-crypto": "^1.6.0",
     "react-native-randombytes": "^3.5.1",
-    "react-native": "^0.57.7",
     "walletconnect-core": "^1.0.0-beta"
   }
 }
