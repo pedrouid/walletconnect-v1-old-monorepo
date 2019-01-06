@@ -1,0 +1,44 @@
+{
+  "name": "walletconnect-monorepo",
+  "description": "Monorepo for WalletConnect Javascript Libraries",
+  "private": true,
+  "keywords": [
+    "walletconnect",
+    "ethereum",
+    "web3",
+    "crypto"
+  ],
+  "author": "WalletConnect <walletconnect.org>",
+  "homepage": "https://walletconnect.org",
+  "license": "LGPL-3.0",
+  "scripts": {
+    "ls": "lerna ls",
+    "bootstrap": "lerna exec -- npm i && lerna link",
+    "build": "lerna run build",
+    "test": "lerna run test",
+    "test:watch": "lerna run test:watch",
+    "clean": "lerna run clean",
+    "clean:node_modules": "lerna exec -- rm -rf node_modules",
+    "clean:package_lock": "lerna exec -- rm -rf package-lock.json",
+    "lint": "eslint packages/*/src/**/*.js packages/*/test/**/*.spec.js",
+    "publish": "npm run check-packages && lerna publish",
+    "check-packages": "npm run clean && npm run lint && npm run build && npm run test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/walletconnect/walletconnect-monorepo.git"
+  },
+  "bugs": {
+    "url": "https://github.com/walletconnect/walletconnect-monorepo/issues"
+  },
+  "devDependencies": {
+    "babel-eslint": "^8.2.6",
+    "eslint": "^5.6.1",
+    "eslint-loader": "^2.1.1",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-node": "^7.0.1",
+    "eslint-plugin-promise": "^4.0.1",
+    "eslint-plugin-standard": "^3.1.0",
+    "lerna": "^3.4.0"
+  }
+}
