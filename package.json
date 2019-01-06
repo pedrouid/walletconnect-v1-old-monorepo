@@ -1,6 +1,6 @@
 {
   "name": "walletconnect-monorepo",
-  "description": "Monorepo for WalletConnect Javascript Libraries",
+  "description": "Monorepo for WalletConnect",
   "private": true,
   "keywords": [
     "walletconnect",
@@ -33,12 +33,14 @@
   },
   "devDependencies": {
     "babel-eslint": "^8.2.6",
-    "eslint": "^5.6.1",
-    "eslint-loader": "^2.1.1",
+    "eslint": "^5.8.0",
+    "eslint-config-standard": "^12.0.0",
     "eslint-plugin-import": "^2.14.0",
     "eslint-plugin-node": "^7.0.1",
     "eslint-plugin-promise": "^4.0.1",
-    "eslint-plugin-standard": "^3.1.0",
+    "eslint-plugin-standard": "^4.0.0",
+    "tslint": "^5.11.0",
+    "tslint-config-standard": "^8.0.1",
     "lerna": "^3.4.0"
   }
 }
