@@ -1,29 +1,29 @@
-import { NativeModules } from 'react-native'
-import crypto from 'react-native-fast-crypto'
-import base64 from 'base64-js'
+// import { NativeModules } from 'react-native'
+// import crypto from 'react-native-fast-crypto'
+// import base64 from 'base64-js'
 import {
   IJsonRpcRequest,
   IJsonRpcResponse,
   IEncryptionPayload
 } from '@walletconnect/types'
 
-crypto.randomBytes = (size: number, cb: any) => {
-  const { randomBytes } = NativeModules.RNRandomBytes
-  if (cb) {
-    randomBytes(size, cb)
-    return
-  }
-  return new Promise((resolve, reject) => {
-    randomBytes(size, (error: any, b: any) => {
-      if (error) {
-        reject(error)
-      }
-      console.log('randomBytes bytes', b) // tslint:disable-line
-      const result = base64.toByteArray(b).buffer
-      resolve(result)
-    })
-  })
-}
+// crypto.randomBytes = (size: number, cb: any) => {
+//   const { randomBytes } = NativeModules.RNRandomBytes
+//   if (cb) {
+//     randomBytes(size, cb)
+//     return
+//   }
+//   return new Promise((resolve, reject) => {
+//     randomBytes(size, (error: any, b: any) => {
+//       if (error) {
+//         reject(error)
+//       }
+//       console.log('randomBytes bytes', b) // tslint:disable-line
+//       const result = base64.toByteArray(b).buffer
+//       resolve(result)
+//     })
+//   })
+// }
 
 const nativeCrypto = {
   generateKey: async (length?: number) => {

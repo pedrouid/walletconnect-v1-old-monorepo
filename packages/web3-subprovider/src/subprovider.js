@@ -1,7 +1,7 @@
 import { promisify } from './utils'
 
 export default class Subprovider {
-  _createFinalPayload(payload) {
+  _createFinalPayload (payload) {
     const finalPayload = {
       id: Subprovider._getRandomId(),
       jsonrpc: '2.0',
@@ -10,7 +10,7 @@ export default class Subprovider {
     }
     return finalPayload
   }
-  _getRandomId() {
+  _getRandomId () {
     const extraDigits = 3
     const baseTen = 10
     const datePart = new Date().getTime() * Math.pow(baseTen, extraDigits)
@@ -18,11 +18,9 @@ export default class Subprovider {
     return datePart + extraPart
   }
 
-  async handleRequest() {
-    return
-  }
+  async handleRequest () {}
 
-  async emitPayloadAsync(payload) {
+  async emitPayloadAsync (payload) {
     const finalPayload = Subprovider._createFinalPayload(payload)
     const response = await promisify(this.engine.sendAsync, this.engine)(
       finalPayload
@@ -30,7 +28,7 @@ export default class Subprovider {
     return response
   }
 
-  setEngine(engine) {
+  setEngine (engine) {
     this.engine = engine
   }
 }

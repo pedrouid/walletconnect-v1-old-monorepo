@@ -1,70 +1,49 @@
-import WalletConnect from 'walletconnect'
+import WalletConnect from '@walletconnect/browser'
 import Subprovider from './subprovider'
 
 export default class WalletConnectSubprovider extends Subprovider {
-  constructor(opts) {
+  constructor (opts) {
     super()
 
     this._walletconnect = new WalletConnect(opts)
   }
 
-  set isWalletConnect(value) {
-    return
-  }
+  set isWalletConnect (value) {}
 
-  get isWalletConnect() {
+  get isWalletConnect () {
     return true
   }
 
-  set isConnected(value) {
-    return
+  set connected (value) {}
+
+  get connected () {
+    return this._walletconnect.connected
   }
 
-  get isConnected() {
-    return this._walletconnect.isConnected
-  }
+  set uri (value) {}
 
-  set uri(value) {
-    return
-  }
-
-  get uri() {
+  get uri () {
     return this._walletconnect.uri
   }
 
-  set accounts(value) {
-    return
-  }
+  set accounts (value) {}
 
-  get accounts() {
+  get accounts () {
     return this._walletconnect.accounts
   }
 
-  async initSession() {
-    const result = await this._walletconnect.initSession()
+  async createSession () {
+    const result = await this._walletconnect.createSession()
     return result
   }
 
-  async listenSessionStatus(interval, timeout) {
-    const result = await this._walletconnect.listenSessionStatus(
-      interval,
-      timeout
-    )
-    return result
-  }
-
-  stopLastListener() {
-    const result = this._walletconnect.stopLastListener()
-    return result
-  }
-
-  setEngine(engine) {
+  setEngine (engine) {
     this.engine = engine
     this.engine.walletconnect = this
     this.engine.isWalletConnect = this.isWalletConnect
   }
 
-  async handleRequest(payload, next, end) {
+  async handleRequest (payload, next, end) {
     switch (payload.method) {
       case 'eth_accounts':
         end(null, this.accounts)
@@ -78,7 +57,7 @@ export default class WalletConnectSubprovider extends Subprovider {
       case 'eth_signTypedData_v3':
       case 'personal_sign':
         try {
-          const result = await this._walletconnect.createCallRequest(payload)
+          const result = await this._walletconnect._sendRequest(payload)
           end(null, result.result)
         } catch (err) {
           end(err)
@@ -86,10 +65,9 @@ export default class WalletConnectSubprovider extends Subprovider {
         return
       default:
         next()
-        return
     }
   }
-  sendAsync(payload, callback) {
+  sendAsync (payload, callback) {
     const next = () => {
       const sendAsync = this.engine.sendAsync.bind(this)
       sendAsync(payload, callback)
