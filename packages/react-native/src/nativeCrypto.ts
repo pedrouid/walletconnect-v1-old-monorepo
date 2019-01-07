@@ -5,7 +5,7 @@ import {
   IJsonRpcRequest,
   IJsonRpcResponse,
   IEncryptionPayload
-} from '../../walletconnect-core/src/types'
+} from '@walletconnect/types'
 
 crypto.randomBytes = (size: number, cb: any) => {
   const { randomBytes } = NativeModules.RNRandomBytes

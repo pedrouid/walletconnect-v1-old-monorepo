@@ -22,7 +22,8 @@
     "strictNullChecks": true,
     "suppressImplicitAnyIndexErrors": true,
     "noUnusedLocals": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "typeRoots": ["./packages/types/src", "node_modules/@types"]
     // "paths": {
     //   "walletconnect-core": ["./packages/walletconnect-core/src"],
     //   "walletconnect": ["./packages/walletconnect/src"],

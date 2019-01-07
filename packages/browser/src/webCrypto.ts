@@ -2,7 +2,7 @@ import {
   IJsonRpcResponse,
   IJsonRpcRequest,
   IEncryptionPayload
-} from '@walletconnect/typings'
+} from '@walletconnect/types'
 
 import {
   concatBuffers,

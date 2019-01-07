@@ -1,1 +1,1 @@
-declare module "react-native-fast-crypto";
+declare module '@walletconnect/react-native'

@@ -1,10 +1,10 @@
 {
-  "name": "@walletconnect/typings",
+  "name": "@walletconnect/types",
   "version": "1.0.0-beta",
-  "description": "Typescript Typings for WalletConnect",
+  "description": "Typescript Types for WalletConnect",
   "scripts": {
     "clean": "rm -rf lib",
-    "build": "browserify ./src/index.ts -p [ tsify ] -t [ babelify ] -o ./lib/index.js",
+    "build": "tsc -b",
     "test": "mocha --require ./babel-polyfill.js test/**/*.spec.ts"
   },
   "keywords": [

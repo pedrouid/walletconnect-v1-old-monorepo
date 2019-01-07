@@ -16,7 +16,7 @@ import {
   ISessionParams,
   IWalletConnectSession,
   IWalletConnectOptions
-} from '@walletconnect/typings'
+} from '@walletconnect/types'
 import {
   convertBufferToHex,
   convertHexToBuffer,

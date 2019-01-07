@@ -1,5 +1,5 @@
 import Connector from '@walletconnect/core'
-import { IWalletConnectOptions } from '@walletconnect/typings'
+import { IWalletConnectOptions } from '@walletconnect/types'
 import cryptoLib from './nativeCrypto'
 
 class RNWalletConnect extends Connector {

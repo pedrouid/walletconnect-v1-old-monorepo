@@ -57,7 +57,7 @@
   },
   "dependencies": {
     "@walletconnect/core": "^1.0.0-beta",
-    "@walletconnect/typings": "^1.0.0-beta",
+    "@walletconnect/types": "^1.0.0-beta",
     "base64-js": "^1.3.0",
     "react-native": "^0.57.7",
     "react-native-fast-crypto": "^1.6.0",

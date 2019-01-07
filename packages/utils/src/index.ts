@@ -7,7 +7,7 @@ import {
   IJsonRpcResponse,
   IInternalEvent,
   IWalletConnectSession
-} from '@walletconnect/typings'
+} from '@walletconnect/types'
 
 export function concatBuffers (...args: ArrayBuffer[]): ArrayBuffer {
   const hex: string = args.map(b => convertBufferToHex(b)).join('')

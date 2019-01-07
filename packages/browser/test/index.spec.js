@@ -1,6 +1,6 @@
 /* global describe it  */
 import './mock/localStorage'
 
-describe('// ------------------ walletconnect ------------------- //', () => {
+describe('// --------------- @walletconnect/browser ---------------- //', () => {
   it('needs tests', () => {})
 })
