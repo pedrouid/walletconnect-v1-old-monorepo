@@ -80,6 +80,8 @@ class Connector {
   private _eventEmitters: IEventEmitter[]
   private _connected: boolean
 
+  // -- constructor ----------------------------------------------------- //
+
   constructor (cryptoLib: ICryptoLib, opts: IWalletConnectOptions) {
     this.cryptoLib = cryptoLib
 
@@ -136,6 +138,8 @@ class Connector {
     this._subscribeToInternalEvents()
     this._socketOpen()
   }
+
+  // -- setters / getters ----------------------------------------------- //
 
   set node (value: string) {
     if (!value) {
@@ -309,6 +313,8 @@ class Connector {
     this.handshakeId = value.handshakeId
     this.handshakeTopic = value.handshakeTopic
   }
+
+  // -- public ---------------------------------------------------------- //
 
   public on (
     event: string,
@@ -554,7 +560,7 @@ class Connector {
     this._sendResponse(formattedResponse)
   }
 
-  // -- Private Methods ----------------------------------------------------- //
+  // -- private --------------------------------------------------------- //
 
   private async _sendRequest (request: IPartialRpcRequest, _topic?: string) {
     const callRequest: IJsonRpcRequest = this._formatRequest(request)
@@ -749,19 +755,40 @@ class Connector {
     })
   }
 
-  private _setToQueue (socketMessage: ISocketMessage) {
-    this._queue.push(socketMessage)
-  }
+  private _triggerEvents (
+    payload: IJsonRpcRequest | IJsonRpcResponse | IInternalEvent
+  ): void {
+    let eventEmitters: IEventEmitter[] = []
+    let event: string
 
-  private _dispatchQueue () {
-    const queue = this._queue
+    if (isRpcRequest(payload)) {
+      event = payload.method
+    } else if (isRpcResponse(payload)) {
+      event = `response:${payload.id}`
+    } else if (isInternalEvent(payload)) {
+      event = payload.event
+    } else {
+      event = ''
+    }
 
-    queue.forEach((socketMessage: ISocketMessage) =>
-      this._socketSend(socketMessage)
+    if (event) {
+      eventEmitters = this._eventEmitters.filter(
+        (eventEmitter: IEventEmitter) => eventEmitter.event === event
+      )
+    }
+
+    if (!eventEmitters || !eventEmitters.length) {
+      eventEmitters = this._eventEmitters.filter(
+        (eventEmitter: IEventEmitter) => eventEmitter.event === 'call_request'
+      )
+    }
+
+    eventEmitters.forEach((eventEmitter: IEventEmitter) =>
+      eventEmitter.callback(null, payload)
     )
-
-    this._queue = []
   }
+
+  // -- websocket ------------------------------------------------------- //
 
   private _socketOpen () {
     const node = this.node
@@ -831,38 +858,21 @@ class Connector {
     }
   }
 
-  private _triggerEvents (
-    payload: IJsonRpcRequest | IJsonRpcResponse | IInternalEvent
-  ): void {
-    let eventEmitters: IEventEmitter[] = []
-    let event: string
-
-    if (isRpcRequest(payload)) {
-      event = payload.method
-    } else if (isRpcResponse(payload)) {
-      event = `response:${payload.id}`
-    } else if (isInternalEvent(payload)) {
-      event = payload.event
-    } else {
-      event = ''
-    }
-
-    if (event) {
-      eventEmitters = this._eventEmitters.filter(
-        (eventEmitter: IEventEmitter) => eventEmitter.event === event
-      )
-    }
-
-    if (!eventEmitters || !eventEmitters.length) {
-      eventEmitters = this._eventEmitters.filter(
-        (eventEmitter: IEventEmitter) => eventEmitter.event === 'call_request'
-      )
-    }
-
-    eventEmitters.forEach((eventEmitter: IEventEmitter) =>
-      eventEmitter.callback(null, payload)
-    )
+  private _setToQueue (socketMessage: ISocketMessage) {
+    this._queue.push(socketMessage)
   }
+
+  private _dispatchQueue () {
+    const queue = this._queue
+
+    queue.forEach((socketMessage: ISocketMessage) =>
+      this._socketSend(socketMessage)
+    )
+
+    this._queue = []
+  }
+
+  // -- uri ------------------------------------------------------------- //
 
   private _formatUri () {
     const protocol = this.protocol
@@ -899,7 +909,7 @@ class Connector {
     }
   }
 
-  // -- crypto --------------------------------------------------------- //
+  // -- crypto ---------------------------------------------------------- //
 
   private async _generateKey (): Promise<ArrayBuffer | null> {
     if (this.cryptoLib) {
