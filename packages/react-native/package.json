@@ -4,7 +4,7 @@
   "description": "React Native SDK for WalletConnect",
   "scripts": {
     "clean": "rm -rf lib",
-    "build": "browserify ./src/index.ts -p [ tsify ] -t [ babelify ] -o ./lib/index.js",
+    "build": "browserify ./src -p [ tsify ] -t [ babelify ] -o ./lib/index.js",
     "test": "mocha --require ./babel-polyfill.js test/**/*.spec.ts"
   },
   "keywords": [
@@ -45,7 +45,6 @@
     "@types/base64-js": "^1.2.5",
     "@types/chai": "^4.1.6",
     "@types/mocha": "^5.2.5",
-    "@types/node": "^10.12.15",
     "@types/react-native": "^0.57.25",
     "babelify": "^10.0.0",
     "browserify": "^16.2.3",

@@ -1,12 +1,8 @@
 import {
   IClientMeta,
-  IRequiredParamsResult,
-  IQueryParamsResult,
   IParseURIResult,
-  IJsonRpcRequest,
-  IJsonRpcResponse,
-  IInternalEvent,
-  IWalletConnectSession
+  IRequiredParamsResult,
+  IQueryParamsResult
 } from '@walletconnect/types'
 
 export function concatBuffers (...args: ArrayBuffer[]): ArrayBuffer {
@@ -299,22 +295,4 @@ export function parseWalletConnectUri (str: string): IParseURIResult {
   }
 
   return result
-}
-
-export function isRpcRequest (object: any): object is IJsonRpcRequest {
-  return 'method' in object
-}
-
-export function isRpcResponse (object: any): object is IJsonRpcResponse {
-  return 'result' in object
-}
-
-export function isInternalEvent (object: any): object is IInternalEvent {
-  return 'event' in object
-}
-
-export function isWalletConnectSession (
-  object: any
-): object is IWalletConnectSession {
-  return 'node' in object
 }

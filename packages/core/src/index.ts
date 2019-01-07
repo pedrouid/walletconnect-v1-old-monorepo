@@ -23,12 +23,28 @@ import {
   getMeta,
   payloadId,
   uuid,
-  parseWalletConnectUri,
-  isRpcRequest,
-  isRpcResponse,
-  isInternalEvent,
-  isWalletConnectSession
+  parseWalletConnectUri
 } from '@walletconnect/utils'
+
+// -- typeChecks ----------------------------------------------------------- //
+
+function isRpcRequest (object: any): object is IJsonRpcRequest {
+  return 'method' in object
+}
+
+function isRpcResponse (object: any): object is IJsonRpcResponse {
+  return 'result' in object
+}
+
+function isInternalEvent (object: any): object is IInternalEvent {
+  return 'event' in object
+}
+
+function isWalletConnectSession (object: any): object is IWalletConnectSession {
+  return 'node' in object
+}
+
+// -- localStorage --------------------------------------------------------- //
 
 const storageId: string = 'walletconnect'
 let storage: Storage | null = null
@@ -39,6 +55,9 @@ if (
 ) {
   storage = window.localStorage
 }
+
+// -- Connector ------------------------------------------------------------ //
+
 class Connector {
   private cryptoLib: ICryptoLib
 
