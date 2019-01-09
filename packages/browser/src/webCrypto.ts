@@ -47,9 +47,10 @@ export async function importKey (
 }
 
 export async function generateKey (length?: number): Promise<ArrayBuffer> {
+  const _length = length || 256
   const cryptoKey = await window.crypto.subtle.generateKey(
     {
-      length: length || 256,
+      length: _length,
       name: AES_ALGORITHM
     },
     true,
