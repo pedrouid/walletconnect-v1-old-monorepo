@@ -13,6 +13,7 @@ import {
 } from '@walletconnect/utils'
 
 const AES_ALGORITHM: string = 'AES-CBC'
+const AES_LENGTH: number = 256
 const HMAC_ALGORITHM: string = 'SHA-256'
 
 export async function exportKey (cryptoKey: CryptoKey): Promise<ArrayBuffer> {
@@ -29,7 +30,7 @@ export async function importKey (
 ): Promise<CryptoKey> {
   const algo: AesKeyAlgorithm | HmacImportParams =
     type === AES_ALGORITHM
-      ? { length: 256, name: AES_ALGORITHM }
+      ? { length: AES_LENGTH, name: AES_ALGORITHM }
       : {
         hash: { name: HMAC_ALGORITHM },
         name: 'HMAC'

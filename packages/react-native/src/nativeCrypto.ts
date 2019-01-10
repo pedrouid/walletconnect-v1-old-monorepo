@@ -1,4 +1,5 @@
-import crypto from 'crypto'
+import RNSimpleCrypto from 'react-native-simple-crypto'
+
 import {
   IJsonRpcRequest,
   IJsonRpcResponse,
@@ -6,32 +7,16 @@ import {
 } from '@walletconnect/types'
 import {
   convertHexToArrayBuffer,
-  convertArrayBufferToBuffer,
-  convertUtf8ToBuffer,
-  convertBufferToUtf8,
-  convertBufferToHex,
-  convertHexToBuffer,
-  concatBuffers
+  convertArrayBufferToHex,
+  convertUtf8ToArrayBuffer,
+  convertArrayBufferToUtf8,
+  concatArrayBuffers
 } from '@walletconnect/utils'
-
-const AES_ALGORITHM = 'AES-256-CBC'
-const HMAC_ALGORITHM = 'SHA256'
-
-export function randomBytes (length: number): Promise<Buffer> {
-  return new Promise((resolve, reject) => {
-    crypto.randomBytes(length, (error: any, result: any) => {
-      if (error) {
-        reject(error)
-      }
-      resolve(result)
-    })
-  })
-}
 
 export async function generateKey (length?: number): Promise<ArrayBuffer> {
   const _length = (length || 256) / 8
-  const buffer: Buffer = await randomBytes(_length)
-  const hex = convertBufferToHex(buffer)
+  const buffer: ArrayBuffer = await RNSimpleCrypto.utils.randomBytes(_length)
+  const hex = convertArrayBufferToHex(buffer)
   const result = convertHexToArrayBuffer(hex)
 
   console.log('result', result)
@@ -39,42 +24,25 @@ export async function generateKey (length?: number): Promise<ArrayBuffer> {
   return result
 }
 
-export async function createHmac (data: Buffer, key: Buffer): Promise<Buffer> {
-  const hmac = crypto.createHmac(HMAC_ALGORITHM, key)
-  hmac.update(data)
-  const hex = hmac.digest('hex')
-  console.log('hex')
-  const result = convertHexToBuffer(hex)
-  console.log('result', result)
-
+export async function createHmac (
+  data: ArrayBuffer,
+  key: ArrayBuffer
+): Promise<ArrayBuffer> {
+  const result = await RNSimpleCrypto.HMAC.hmac256(data, key)
   return result
 }
 
 export async function verifyHmac (
   payload: IEncryptionPayload,
-  key: Buffer
+  key: ArrayBuffer
 ): Promise<boolean> {
-  const cipherText: Buffer = convertHexToBuffer(payload.data)
-  console.log('cipherText', cipherText)
-
-  const iv: Buffer = convertHexToBuffer(payload.iv)
-  console.log('iv', iv)
-
-  const hmac: Buffer = convertHexToBuffer(payload.hmac)
-  console.log('hmac', hmac)
-
-  const hmacHex: string = convertBufferToHex(hmac)
-  console.log('hmacHex', hmacHex)
-
-  const unsigned: Buffer = concatBuffers(cipherText, iv)
-  console.log('unsigned', unsigned)
-
-  const chmac: Buffer = await createHmac(unsigned, key)
-  console.log('chmac', chmac)
-
-  const chmacHex: string = convertBufferToHex(chmac)
-  console.log('chmacHex', chmacHex)
-
+  const cipherText: ArrayBuffer = convertHexToArrayBuffer(payload.data)
+  const iv: ArrayBuffer = convertHexToArrayBuffer(payload.iv)
+  const hmac: ArrayBuffer = convertHexToArrayBuffer(payload.hmac)
+  const hmacHex: string = convertArrayBufferToHex(hmac)
+  const unsigned: ArrayBuffer = concatArrayBuffers(cipherText, iv)
+  const chmac: ArrayBuffer = await createHmac(unsigned, key)
+  const chmacHex: string = convertArrayBufferToHex(chmac)
   if (hmacHex === chmacHex) {
     return true
   }
@@ -83,34 +51,20 @@ export async function verifyHmac (
 }
 
 export async function aesCbcEncrypt (
-  data: Buffer,
-  key: Buffer,
-  iv: Buffer
-): Promise<Buffer> {
-  const cipher = crypto.createCipheriv(AES_ALGORITHM, key, iv)
-  cipher.write(data)
-  cipher.end()
-
-  const hex = cipher.final('hex')
-  console.log('hex')
-  const result = convertHexToBuffer(hex)
-  console.log('result', result)
-
+  data: ArrayBuffer,
+  key: ArrayBuffer,
+  iv: ArrayBuffer
+): Promise<ArrayBuffer> {
+  const result = await RNSimpleCrypto.AES.encrypt(data, key, iv)
   return result
 }
 
 export async function aesCbcDecrypt (
-  data: Buffer,
-  key: Buffer,
-  iv: Buffer
-): Promise<Buffer> {
-  const decipher = crypto.createDecipheriv(AES_ALGORITHM, key, iv)
-  decipher.update(data, 'hex', 'utf8')
-  const hex = decipher.final('hex')
-  console.log('hex')
-  const result = convertHexToBuffer(hex)
-  console.log('result', result)
-
+  data: ArrayBuffer,
+  key: ArrayBuffer,
+  iv: ArrayBuffer
+): Promise<ArrayBuffer> {
+  const result = await RNSimpleCrypto.AES.decrypt(data, key, iv)
   return result
 }
 
@@ -118,21 +72,18 @@ export async function encrypt (
   data: IJsonRpcRequest | IJsonRpcResponse,
   key: ArrayBuffer
 ): Promise<IEncryptionPayload> {
-  const _key: Buffer = convertArrayBufferToBuffer(key)
-
-  const ivArrayBuffer: ArrayBuffer = await generateKey(128)
-  const iv: Buffer = convertArrayBufferToBuffer(ivArrayBuffer)
-  const ivHex: string = convertBufferToHex(iv)
+  const iv: ArrayBuffer = await generateKey(128)
+  const ivHex: string = convertArrayBufferToHex(iv)
 
   const contentString: string = JSON.stringify(data)
-  const content: Buffer = convertUtf8ToBuffer(contentString)
+  const content: ArrayBuffer = convertUtf8ToArrayBuffer(contentString)
 
-  const cipherText: Buffer = await aesCbcEncrypt(content, _key, iv)
-  const cipherTextHex: string = convertBufferToHex(cipherText)
+  const cipherText: ArrayBuffer = await aesCbcEncrypt(content, key, iv)
+  const cipherTextHex: string = convertArrayBufferToHex(cipherText)
 
-  const unsigned: Buffer = concatBuffers(cipherText, iv)
-  const hmac: Buffer = await createHmac(unsigned, _key)
-  const hmacHex: string = convertBufferToHex(hmac)
+  const unsigned: ArrayBuffer = concatArrayBuffers(cipherText, iv)
+  const hmac: ArrayBuffer = await createHmac(unsigned, key)
+  const hmacHex: string = convertArrayBufferToHex(hmac)
 
   return {
     data: cipherTextHex,
@@ -145,21 +96,19 @@ export async function decrypt (
   payload: IEncryptionPayload,
   key: ArrayBuffer
 ): Promise<IJsonRpcRequest | IJsonRpcResponse | null> {
-  const _key: Buffer = convertArrayBufferToBuffer(key)
-
-  if (!_key) {
+  if (!key) {
     throw new Error('Missing key: required for decryption')
   }
 
-  const verified: boolean = await verifyHmac(payload, _key)
+  const verified: boolean = await verifyHmac(payload, key)
   if (!verified) {
     return null
   }
 
-  const cipherText: Buffer = convertHexToBuffer(payload.data)
-  const iv: Buffer = convertHexToBuffer(payload.iv)
-  const buffer: Buffer = await aesCbcDecrypt(cipherText, _key, iv)
-  const utf8: string = convertBufferToUtf8(buffer)
+  const cipherText: ArrayBuffer = convertHexToArrayBuffer(payload.data)
+  const iv: ArrayBuffer = convertHexToArrayBuffer(payload.iv)
+  const buffer: ArrayBuffer = await aesCbcDecrypt(cipherText, key, iv)
+  const utf8: string = convertArrayBufferToUtf8(buffer)
   let data: IJsonRpcRequest
   try {
     data = JSON.parse(utf8)
