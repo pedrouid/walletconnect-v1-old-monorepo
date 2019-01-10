@@ -18,9 +18,6 @@ export async function generateKey (length?: number): Promise<ArrayBuffer> {
   const buffer: ArrayBuffer = await RNSimpleCrypto.utils.randomBytes(_length)
   const hex = convertArrayBufferToHex(buffer)
   const result = convertHexToArrayBuffer(hex)
-
-  console.log('result', result)
-
   return result
 }
 
