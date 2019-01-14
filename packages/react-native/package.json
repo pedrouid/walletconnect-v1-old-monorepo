@@ -58,7 +58,6 @@
   "dependencies": {
     "@walletconnect/core": "^1.0.0-beta",
     "@walletconnect/types": "^1.0.0-beta",
-    "@walletconnect/utils": "^1.0.0-beta",
-    "react-native-simple-crypto": "^0.2.5"
+    "@walletconnect/utils": "^1.0.0-beta"
   }
 }
