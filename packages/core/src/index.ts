@@ -41,7 +41,7 @@ function isInternalEvent(object: any): object is IInternalEvent {
 }
 
 function isWalletConnectSession(object: any): object is IWalletConnectSession {
-  return "node" in object;
+  return "bridge" in object;
 }
 
 // -- localStorage --------------------------------------------------------- //
@@ -64,7 +64,7 @@ class Connector {
   private protocol: string;
   private version: number;
 
-  private _node: string;
+  private _bridge: string;
   private _key: ArrayBuffer | null;
 
   private _clientId: string;
@@ -82,13 +82,13 @@ class Connector {
 
   // -- constructor ----------------------------------------------------- //
 
-  constructor(cryptoLib: ICryptoLib, opts: IWalletConnectOptions) {
+  constructor(cryptoLib: ICryptoLib, opts: IWalletConnectOptions, clientMeta?: IClientMeta) {
     this.cryptoLib = cryptoLib;
 
     this.protocol = "wc";
     this.version = 1;
 
-    this._node = "";
+    this._bridge = "";
     this._key = null;
 
     this._clientId = "";
@@ -104,18 +104,18 @@ class Connector {
     this._eventEmitters = [];
     this._connected = false;
 
-    if (!opts.node && !opts.uri && !opts.session) {
+    if (clientMeta) {
+      this.clientMeta = clientMeta;
+    }
+
+    if (!opts.bridge && !opts.uri && !opts.session) {
       throw new Error(
-        "Missing one of two required parameters: node / uri / session"
+        "Missing one of two required parameters: bridge / uri / session"
       );
     }
 
-    if (opts.clientMeta) {
-      this.clientMeta = opts.clientMeta;
-    }
-
-    if (opts.node) {
-      this.node = opts.node;
+    if (opts.bridge) {
+      this.bridge = opts.bridge;
     }
 
     if (opts.uri) {
@@ -141,15 +141,15 @@ class Connector {
 
   // -- setters / getters ----------------------------------------------- //
 
-  set node(value: string) {
+  set bridge(value: string) {
     if (!value) {
-      throw new Error("Missing node parameter value");
+      throw new Error("Missing bridge parameter value");
     }
-    this._node = value;
+    this._bridge = value;
   }
 
-  get node() {
-    return this._node;
+  get bridge() {
+    return this._bridge;
   }
 
   set key(value: string) {
@@ -195,11 +195,13 @@ class Connector {
     return this._peerId;
   }
 
-  set clientMeta(value) {}
+  set clientMeta(value) {
+    return;
+  }
 
   get clientMeta() {
     let clientMeta: IClientMeta | null = this._clientMeta;
-    if (!clientMeta || !Object.keys(clientMeta).length) {
+    if (!clientMeta) {
       clientMeta = this._clientMeta = getMeta();
     }
     return clientMeta;
@@ -245,9 +247,9 @@ class Connector {
     if (!value) {
       return;
     }
-    const { handshakeTopic, node, key } = this._parseUri(value);
+    const { handshakeTopic, bridge, key } = this._parseUri(value);
     this.handshakeTopic = handshakeTopic;
-    this.node = node;
+    this.bridge = bridge;
     this.key = key;
   }
 
@@ -269,13 +271,17 @@ class Connector {
     return accounts;
   }
 
-  set connected(value) {}
+  set connected(value) {
+    return;
+  }
 
   get connected() {
     return this._connected;
   }
 
-  set pending(value) {}
+  set pending(value) {
+    return;
+  }
 
   get pending() {
     return !!this._handshakeTopic;
@@ -286,7 +292,7 @@ class Connector {
       connected: this.connected,
       accounts: this.accounts,
       chainId: this.chainId,
-      node: this.node,
+      bridge: this.bridge,
       key: this.key,
       clientId: this.clientId,
       clientMeta: this.clientMeta,
@@ -304,7 +310,7 @@ class Connector {
     this._connected = value.connected;
     this.accounts = value.accounts;
     this.chainId = value.chainId;
-    this.node = value.node;
+    this.bridge = value.bridge;
     this.key = value.key;
     this.clientId = value.clientId;
     this.clientMeta = value.clientMeta;
@@ -791,13 +797,13 @@ class Connector {
   // -- websocket ------------------------------------------------------- //
 
   private _socketOpen() {
-    const node = this.node;
+    const bridge = this.bridge;
 
-    const url = node.startsWith("https")
-      ? node.replace("https", "wss")
-      : node.startsWith("http")
-      ? node.replace("http", "ws")
-      : node;
+    const url = bridge.startsWith("https")
+      ? bridge.replace("https", "wss")
+      : bridge.startsWith("http")
+      ? bridge.replace("http", "ws")
+      : bridge;
 
     const socket = new WebSocket(url);
 
@@ -878,9 +884,9 @@ class Connector {
     const protocol = this.protocol;
     const handshakeTopic = this.handshakeTopic;
     const version = this.version;
-    const node = encodeURIComponent(this.node);
+    const bridge = encodeURIComponent(this.bridge);
     const key = this.key;
-    const uri = `${protocol}:${handshakeTopic}@${version}?node=${node}&key=${key}`;
+    const uri = `${protocol}:${handshakeTopic}@${version}?bridge=${bridge}&key=${key}`;
     return uri;
   }
 
@@ -893,17 +899,17 @@ class Connector {
       }
       const handshakeTopic = result.handshakeTopic;
 
-      if (!result.node) {
-        throw Error("Invalid or missing node url parameter value");
+      if (!result.bridge) {
+        throw Error("Invalid or missing bridge url parameter value");
       }
-      const node = decodeURIComponent(result.node);
+      const bridge = decodeURIComponent(result.bridge);
 
       if (!result.key) {
         throw Error("Invalid or missing kkey parameter value");
       }
       const key = result.key;
 
-      return { handshakeTopic, node, key };
+      return { handshakeTopic, bridge, key };
     } else {
       throw new Error("URI format doesn't follow Connector protocol");
     }

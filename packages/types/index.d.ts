@@ -92,7 +92,7 @@ declare module '@walletconnect/types' {
   }
 
   export interface IQueryParamsResult {
-    node: string
+    bridge: string
     key: string
   }
 
@@ -100,7 +100,7 @@ declare module '@walletconnect/types' {
     protocol: string
     handshakeTopic: string
     version: number
-    node: string
+    bridge: string
     key: string
   }
 
@@ -117,7 +117,7 @@ declare module '@walletconnect/types' {
     connected: boolean
     accounts: string[]
     chainId: number
-    node: string
+    bridge: string
     key: string
     clientId: string
     clientMeta: IClientMeta | null
@@ -128,9 +128,8 @@ declare module '@walletconnect/types' {
   }
 
   export interface IWalletConnectOptions {
-    node?: string
+    bridge?: string
     uri?: string
     session?: IWalletConnectSession
-    clientMeta?: IClientMeta
   }
 }
