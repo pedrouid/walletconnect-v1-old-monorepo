@@ -1,6 +1,6 @@
 /* global window setTimeout */
 
-import qrImage from 'qr-image'
+import * as qrImage from 'qr-image'
 import style from './style'
 import asset from './asset'
 
