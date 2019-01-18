@@ -10,11 +10,12 @@ if (typeof window !== 'undefined' && typeof window.document !== 'undefined') {
 }
 
 function formatQRCodeImage (data: string) {
+  let result = ''
   const dataString = qrImage.imageSync(data, { type: 'svg' })
   if (typeof dataString === 'string') {
-    dataString.replace('<svg', `<svg style="${style.qrcode.image}"`)
+    result = dataString.replace('<svg', `<svg style="${style.qrcode.image}"`)
   }
-  return ''
+  return result
 }
 
 function formatQRCodeModal (qrCodeImage: string) {
