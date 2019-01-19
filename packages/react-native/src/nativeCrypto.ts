@@ -1,5 +1,9 @@
-import crypto from "crypto";
-import { IJsonRpcRequest, IJsonRpcResponse, IEncryptionPayload } from "@walletconnect/types";
+import crypto from 'crypto'
+import {
+  IJsonRpcRequest,
+  IJsonRpcResponse,
+  IEncryptionPayload
+} from '@walletconnect/types'
 import {
   convertHexToArrayBuffer,
   convertArrayBufferToBuffer,
@@ -8,144 +12,148 @@ import {
   convertBufferToHex,
   convertHexToBuffer,
   concatBuffers
-} from "@walletconnect/utils";
+} from '@walletconnect/utils'
 
-const AES_ALGORITHM = "AES-256-CBC";
-const HMAC_ALGORITHM = "SHA256";
+const AES_ALGORITHM = 'AES-256-CBC'
+const HMAC_ALGORITHM = 'SHA256'
 
-export function randomBytes(length: number): Promise<Buffer> {
+export function randomBytes (length: number): Promise<Buffer> {
   return new Promise((resolve, reject) => {
     crypto.randomBytes(length, (error: any, result: any) => {
       if (error) {
-        reject(error);
+        reject(error)
       }
-      resolve(result);
-    });
-  });
+      resolve(result)
+    })
+  })
 }
 
-export async function generateKey(length?: number): Promise<ArrayBuffer> {
-  const _length = (length || 256) / 8;
-  const buffer: Buffer = await randomBytes(_length);
-  const hex = convertBufferToHex(buffer);
-  const result = convertHexToArrayBuffer(hex);
+export async function generateKey (length?: number): Promise<ArrayBuffer> {
+  const _length = (length || 256) / 8
+  const buffer: Buffer = await randomBytes(_length)
+  const hex = convertBufferToHex(buffer)
+  const result = convertHexToArrayBuffer(hex)
 
-  return result;
+  return result
 }
 
-export async function createHmac(data: Buffer, key: Buffer): Promise<Buffer> {
-  const hmac = crypto.createHmac(HMAC_ALGORITHM, key);
-  hmac.update(data);
-  const hex = hmac.digest("hex");
-  const result = convertHexToBuffer(hex);
+export async function createHmac (data: Buffer, key: Buffer): Promise<Buffer> {
+  const hmac = crypto.createHmac(HMAC_ALGORITHM, key)
+  hmac.update(data)
+  const hex = hmac.digest('hex')
+  const result = convertHexToBuffer(hex)
 
-  return result;
+  return result
 }
 
-export async function verifyHmac(
+export async function verifyHmac (
   payload: IEncryptionPayload,
   key: Buffer
 ): Promise<boolean> {
-  const cipherText: Buffer = convertHexToBuffer(payload.data);
+  const cipherText: Buffer = convertHexToBuffer(payload.data)
 
-  const iv: Buffer = convertHexToBuffer(payload.iv);
+  const iv: Buffer = convertHexToBuffer(payload.iv)
 
-  const hmac: Buffer = convertHexToBuffer(payload.hmac);
+  const hmac: Buffer = convertHexToBuffer(payload.hmac)
 
-  const hmacHex: string = convertBufferToHex(hmac);
+  const hmacHex: string = convertBufferToHex(hmac)
 
-  const unsigned: Buffer = concatBuffers(cipherText, iv);
+  const unsigned: Buffer = concatBuffers(cipherText, iv)
 
-  const chmac: Buffer = await createHmac(unsigned, key);
+  const chmac: Buffer = await createHmac(unsigned, key)
 
-  const chmacHex: string = convertBufferToHex(chmac);
+  const chmacHex: string = convertBufferToHex(chmac)
 
   if (hmacHex === chmacHex) {
-    return true;
+    return true
   }
 
-  return false;
+  return false
 }
 
-export async function aesCbcEncrypt(
+export async function aesCbcEncrypt (
   data: Buffer,
   key: Buffer,
   iv: Buffer
 ): Promise<Buffer> {
-  const cipher = crypto.createCipheriv(AES_ALGORITHM, key, iv);
-  cipher.write(data);
-  cipher.end();
+  const cipher = crypto.createCipheriv(AES_ALGORITHM, key, iv)
+  cipher.setEncoding('hex')
+  cipher.write(data)
+  cipher.end()
 
-  const hex = cipher.final("hex");
-  const result = convertHexToBuffer(hex);
-
-  return result;
+  const hex = cipher.read()
+  if (typeof hex === 'string') {
+    const result = convertHexToBuffer(hex)
+    return result
+  } else {
+    return new Buffer('')
+  }
 }
 
-export async function aesCbcDecrypt(
+export async function aesCbcDecrypt (
   data: Buffer,
   key: Buffer,
   iv: Buffer
 ): Promise<Buffer> {
-  const decipher = crypto.createDecipheriv(AES_ALGORITHM, key, iv);
-  let decrypted = decipher.update(data);
-  decrypted = concatBuffers(decrypted, decipher.final());
-  const result = decrypted;
-  return result;
+  const decipher = crypto.createDecipheriv(AES_ALGORITHM, key, iv)
+  let decrypted = decipher.update(data)
+  decrypted = concatBuffers(decrypted, decipher.final())
+  const result = decrypted
+  return result
 }
 
-export async function encrypt(
+export async function encrypt (
   data: IJsonRpcRequest | IJsonRpcResponse,
   key: ArrayBuffer
 ): Promise<IEncryptionPayload> {
-  const _key: Buffer = convertArrayBufferToBuffer(key);
+  const _key: Buffer = convertArrayBufferToBuffer(key)
 
-  const ivArrayBuffer: ArrayBuffer = await generateKey(128);
-  const iv: Buffer = convertArrayBufferToBuffer(ivArrayBuffer);
-  const ivHex: string = convertBufferToHex(iv);
+  const ivArrayBuffer: ArrayBuffer = await generateKey(128)
+  const iv: Buffer = convertArrayBufferToBuffer(ivArrayBuffer)
+  const ivHex: string = convertBufferToHex(iv)
 
-  const contentString: string = JSON.stringify(data);
-  const content: Buffer = convertUtf8ToBuffer(contentString);
+  const contentString: string = JSON.stringify(data)
+  const content: Buffer = convertUtf8ToBuffer(contentString)
 
-  const cipherText: Buffer = await aesCbcEncrypt(content, _key, iv);
-  const cipherTextHex: string = convertBufferToHex(cipherText);
+  const cipherText: Buffer = await aesCbcEncrypt(content, _key, iv)
+  const cipherTextHex: string = convertBufferToHex(cipherText)
 
-  const unsigned: Buffer = concatBuffers(cipherText, iv);
-  const hmac: Buffer = await createHmac(unsigned, _key);
-  const hmacHex: string = convertBufferToHex(hmac);
+  const unsigned: Buffer = concatBuffers(cipherText, iv)
+  const hmac: Buffer = await createHmac(unsigned, _key)
+  const hmacHex: string = convertBufferToHex(hmac)
 
   return {
     data: cipherTextHex,
     hmac: hmacHex,
     iv: ivHex
-  };
+  }
 }
 
-export async function decrypt(
+export async function decrypt (
   payload: IEncryptionPayload,
   key: ArrayBuffer
 ): Promise<IJsonRpcRequest | IJsonRpcResponse | null> {
-  const _key: Buffer = convertArrayBufferToBuffer(key);
+  const _key: Buffer = convertArrayBufferToBuffer(key)
 
   if (!_key) {
-    throw new Error("Missing key: required for decryption");
+    throw new Error('Missing key: required for decryption')
   }
 
-  const verified: boolean = await verifyHmac(payload, _key);
+  const verified: boolean = await verifyHmac(payload, _key)
   if (!verified) {
-    return null;
+    return null
   }
 
-  const cipherText: Buffer = convertHexToBuffer(payload.data);
-  const iv: Buffer = convertHexToBuffer(payload.iv);
-  const buffer: Buffer = await aesCbcDecrypt(cipherText, _key, iv);
-  const utf8: string = convertBufferToUtf8(buffer);
-  let data: IJsonRpcRequest;
+  const cipherText: Buffer = convertHexToBuffer(payload.data)
+  const iv: Buffer = convertHexToBuffer(payload.iv)
+  const buffer: Buffer = await aesCbcDecrypt(cipherText, _key, iv)
+  const utf8: string = convertBufferToUtf8(buffer)
+  let data: IJsonRpcRequest
   try {
-    data = JSON.parse(utf8);
+    data = JSON.parse(utf8)
   } catch (error) {
-    throw new Error(`Failed to parse invalid JSON`);
+    throw new Error(`Failed to parse invalid JSON`)
   }
 
-  return data;
+  return data
 }
