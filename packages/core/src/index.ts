@@ -66,6 +66,7 @@ class Connector {
 
   private _bridge: string
   private _key: ArrayBuffer | null
+  private _nextKey: ArrayBuffer | null
 
   private _clientId: string
   private _clientMeta: IClientMeta | null
@@ -94,6 +95,7 @@ class Connector {
 
     this._bridge = ''
     this._key = null
+    this._nextKey = null
 
     this._clientId = ''
     this._clientMeta = null
@@ -124,12 +126,14 @@ class Connector {
 
     if (opts.uri) {
       this.uri = opts.uri
+      this._recycleKey()
       this._subscribeToSessionRequest()
     }
 
     const session = opts.session || this._getStorageSession()
     if (session) {
       this.session = session
+      this._recycleKey()
     }
 
     if (this.handshakeId) {
@@ -172,6 +176,22 @@ class Connector {
     return ''
   }
 
+  set nextKey (value: string) {
+    if (!value) {
+      return
+    }
+    const nextKey: ArrayBuffer = convertHexToArrayBuffer(value)
+    this._nextKey = nextKey
+  }
+
+  get nextKey (): string {
+    if (this._nextKey) {
+      const nextKey: string = convertArrayBufferToHex(this._nextKey)
+      return nextKey
+    }
+    return ''
+  }
+
   set clientId (value: string) {
     if (!value) {
       return
@@ -199,7 +219,9 @@ class Connector {
     return this._peerId
   }
 
-  set clientMeta (value) {}
+  set clientMeta (value) {
+
+  }
 
   get clientMeta () {
     let clientMeta: IClientMeta | null = this._clientMeta
@@ -273,13 +295,17 @@ class Connector {
     return accounts
   }
 
-  set connected (value) {}
+  set connected (value) {
+
+  }
 
   get connected () {
     return this._connected
   }
 
-  set pending (value) {}
+  set pending (value) {
+
+  }
 
   get pending () {
     return !!this._handshakeTopic
@@ -633,10 +659,10 @@ class Connector {
     return formattedRequest
   }
 
-  private _formatResponse (request: IPartialRpcResponse): IJsonRpcResponse {
+  private _formatResponse (response: IPartialRpcResponse): IJsonRpcResponse {
     const formattedResponse: IJsonRpcResponse = {
       jsonrpc: '2.0',
-      ...request
+      ...response
     }
     return formattedResponse
   }
@@ -757,6 +783,13 @@ class Connector {
       }
       this._handleSessionResponse(payload.params[0], 'Session disconnected')
     })
+
+    this.on('wc_recycleKey', (error, payload) => {
+      if (error) {
+        console.error(error) // tslint:disable-line
+      }
+      this._handleRecycleKeyRequest(payload)
+    })
   }
 
   private _triggerEvents (
@@ -790,6 +823,50 @@ class Connector {
     eventEmitters.forEach((eventEmitter: IEventEmitter) =>
       eventEmitter.callback(null, payload)
     )
+  }
+
+  // -- keyManager ------------------------------------------------------- //
+
+  private async _recycleKey () {
+    this._nextKey = await this._generateKey()
+
+    const request: IJsonRpcRequest = this._formatRequest({
+      method: 'wc_recycleKey',
+      params: [
+        {
+          peerId: this.clientId,
+          peerMeta: this.clientMeta,
+          nextKey: this.nextKey
+        }
+      ]
+    })
+
+    try {
+      await this._sendCallRequest(request)
+      this._swapKey()
+    } catch (error) {
+      throw error
+    }
+  }
+
+  private async _handleRecycleKeyRequest (payload: IJsonRpcRequest) {
+    const { peerId, peerMeta, nextKey } = payload.params[0]
+    this.peerId = peerId
+    this.peerMeta = peerMeta
+    this.nextKey = nextKey
+    const response = {
+      id: payload.id,
+      jsonrpc: '2.0',
+      result: true
+    }
+    await this._sendResponse(response)
+    this._swapKey()
+  }
+
+  private _swapKey () {
+    this._key = this._nextKey
+    this._nextKey = null
+    this._setStorageSession()
   }
 
   // -- websocket ------------------------------------------------------- //
