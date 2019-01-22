@@ -1,6 +1,7 @@
 import {
   IClientMeta,
   IParseURIResult,
+  IJsonRpcRequest,
   IRequiredParamsResult,
   IQueryParamsResult
 } from '@walletconnect/types'
@@ -337,4 +338,27 @@ export function parseWalletConnectUri (str: string): IParseURIResult {
   }
 
   return result
+}
+
+export function promisify (
+  originalFn: (...args: any[]) => void,
+  thisArg?: any
+): (...callArgs: any[]) => Promise<IJsonRpcRequest | null> {
+  const promisifiedFunction = async (
+    ...callArgs: any[]
+  ): Promise<IJsonRpcRequest | null> => {
+    return new Promise((resolve, reject) => {
+      const callback = (err: Error | null, data?: IJsonRpcRequest) => {
+        if (err === null || typeof err === 'undefined') {
+          reject(err)
+        }
+        if (typeof data === 'undefined') {
+          resolve(data)
+        }
+        resolve(null)
+      }
+      originalFn.apply(thisArg, [...callArgs, callback])
+    })
+  }
+  return promisifiedFunction
 }

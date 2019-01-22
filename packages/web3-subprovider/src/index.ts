@@ -1,11 +1,20 @@
 import WalletConnect from '@walletconnect/browser'
 import Subprovider from './subprovider'
+import {
+  ICallback,
+  IWeb3Provider,
+  IJsonRpcRequest,
+  IErrorCallback,
+  IJsonRpcCallback
+} from '@walletconnect/types'
 
 export default class WalletConnectSubprovider extends Subprovider {
-  constructor (opts) {
+  private _walletConnector: any
+
+  constructor (opts: any) {
     super()
 
-    this._walletconnect = new WalletConnect(opts)
+    this._walletConnector = new WalletConnect(opts)
   }
 
   set isWalletConnect (value) {}
@@ -17,33 +26,35 @@ export default class WalletConnectSubprovider extends Subprovider {
   set connected (value) {}
 
   get connected () {
-    return this._walletconnect.connected
+    return this._walletConnector.connected
   }
 
   set uri (value) {}
 
   get uri () {
-    return this._walletconnect.uri
+    return this._walletConnector.uri
   }
 
   set accounts (value) {}
 
   get accounts () {
-    return this._walletconnect.accounts
+    return this._walletConnector.accounts
   }
 
   async createSession () {
-    const result = await this._walletconnect.createSession()
+    const result = await this._walletConnector.createSession()
     return result
   }
 
-  setEngine (engine) {
+  setEngine (engine: IWeb3Provider) {
     this.engine = engine
-    this.engine.walletconnect = this
-    this.engine.isWalletConnect = this.isWalletConnect
   }
 
-  async handleRequest (payload, next, end) {
+  async handleRequest (
+    payload: IJsonRpcRequest,
+    next: ICallback,
+    end: IErrorCallback
+  ) {
     switch (payload.method) {
       case 'eth_accounts':
         end(null, this.accounts)
@@ -57,7 +68,7 @@ export default class WalletConnectSubprovider extends Subprovider {
       case 'eth_signTypedData_v3':
       case 'personal_sign':
         try {
-          const result = await this._walletconnect._sendRequest(payload)
+          const result = await this._walletConnector._sendCallRequest(payload)
           end(null, result.result)
         } catch (err) {
           end(err)
@@ -67,12 +78,12 @@ export default class WalletConnectSubprovider extends Subprovider {
         next()
     }
   }
-  sendAsync (payload, callback) {
+  sendAsync (payload: IJsonRpcRequest, callback: IJsonRpcCallback) {
     const next = () => {
       const sendAsync = this.engine.sendAsync.bind(this)
       sendAsync(payload, callback)
     }
-    const end = (err, data) => {
+    const end = (err: Error | null, data?: any) => {
       return err ? callback(err) : callback(null, { ...payload, result: data })
     }
     this.handleRequest(payload, next, end)

@@ -54,6 +54,7 @@
   },
   "dependencies": {
     "@walletconnect/browser": "^1.0.0-beta",
-    "@walletconnect/types": "^1.0.0-beta"
+    "@walletconnect/types": "^1.0.0-beta",
+    "@walletconnect/utils": "^1.0.0-beta"
   }
 }

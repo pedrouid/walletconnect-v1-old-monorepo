@@ -3,9 +3,9 @@ import RpcSubprovider from 'web3-provider-engine/subproviders/rpc'
 import WalletConnectSubprovider from '@walletconnect/web3-subprovider'
 
 export default function (opts) {
-  const bridgeUrl = opts.bridgeUrl || null
-  if (!bridgeUrl || typeof bridgeUrl !== 'string') {
-    throw new Error('Missing or Invalid bridgeUrl field')
+  const bridge = opts.bridge || null
+  if (!bridge || typeof bridge !== 'string') {
+    throw new Error('Missing or Invalid bridge field')
   }
 
   const rpcUrl = opts.rpcUrl || null
