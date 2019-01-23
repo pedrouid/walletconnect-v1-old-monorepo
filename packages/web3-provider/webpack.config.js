@@ -4,7 +4,7 @@ const pkg = require('./package.json')
 module.exports = {
   mode: 'production',
   entry: {
-    index: './src/index.js'
+    index: './src/index.ts'
   },
   output: {
     path: path.resolve(__dirname, 'lib'),

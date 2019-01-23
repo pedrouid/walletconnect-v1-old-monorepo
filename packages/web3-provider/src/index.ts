@@ -2,7 +2,7 @@ import ProviderEngine from 'web3-provider-engine'
 import RpcSubprovider from 'web3-provider-engine/subproviders/rpc'
 import WalletConnectSubprovider from '@walletconnect/web3-subprovider'
 
-export default function (opts) {
+export default function (opts: any) {
   const bridge = opts.bridge || null
   if (!bridge || typeof bridge !== 'string') {
     throw new Error('Missing or Invalid bridge field')
