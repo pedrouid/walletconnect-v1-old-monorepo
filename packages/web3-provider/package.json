@@ -1,6 +1,6 @@
 {
   "name": "@walletconnect/web3-provider",
-  "version": "1.0.0-alpha",
+  "version": "1.0.1-alpha.0",
   "description": "Web3 Provider for WalletConnect",
   "scripts": {
     "clean": "rm -rf lib",
@@ -53,8 +53,8 @@
     "webpack-cli": "^3.2.1"
   },
   "dependencies": {
-    "@walletconnect/types": "^1.0.0-alpha",
-    "@walletconnect/web3-subprovider": "^1.0.0-alpha",
+    "@walletconnect/types": "^1.0.1-alpha.0",
+    "@walletconnect/web3-subprovider": "^1.0.1-alpha.0",
     "web3-provider-engine": "^14.0.6"
   }
 }
