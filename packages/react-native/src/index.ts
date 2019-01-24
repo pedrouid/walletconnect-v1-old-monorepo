@@ -32,6 +32,7 @@ class RNWalletConnect extends Connector {
     }
 
     const pushSubscription: IPushSubscription = {
+      bridge: this.bridge,
       topic: this.clientId,
       type: push.type,
       token: push.token,

@@ -158,6 +158,7 @@ declare module '@walletconnect/types' {
   }
 
   export interface IPushSubscription {
+    bridge: string
     topic: string
     type: string
     token: string
