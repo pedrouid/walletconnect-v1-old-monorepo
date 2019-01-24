@@ -154,7 +154,7 @@ declare module '@walletconnect/types' {
 
   export interface INativeWalletOptions {
     clientMeta: IClientMeta
-    push?: IPushServerOptions
+    push?: IPushServerOptions | null
   }
 
   export interface IPushSubscription {
