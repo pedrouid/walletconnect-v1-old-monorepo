@@ -3,7 +3,7 @@ import {
   IWalletConnectOptions,
   INativeWalletOptions,
   IPushServerOptions,
-  IClientDetails
+  IPushSubscription
 } from '@walletconnect/types'
 import * as cryptoLib from './nativeCrypto'
 
@@ -31,7 +31,8 @@ class RNWalletConnect extends Connector {
       throw Error('Invalid or missing push.token parameter value')
     }
 
-    const clientDetails: IClientDetails = {
+    const pushSubscription: IPushSubscription = {
+      topic: this.clientId,
       type: push.type,
       token: push.token,
       peerName: '',
@@ -45,14 +46,17 @@ class RNWalletConnect extends Connector {
 
       if (push.peerMeta) {
         const peerName = payload.params[0].peerMeta.name
-        clientDetails.peerName = peerName
+        pushSubscription.peerName = peerName
       }
 
-      this.postClientDetails(push.url, clientDetails)
+      this.postClientDetails(push.url, pushSubscription)
     })
   }
 
-  private async postClientDetails (url: string, clientDetails: IClientDetails) {
+  private async postClientDetails (
+    url: string,
+    pushSubcription: IPushSubscription
+  ) {
     try {
       const response = await fetch(`${url}/new`, {
         method: 'POST',
@@ -60,7 +64,7 @@ class RNWalletConnect extends Connector {
           Accept: 'application/json',
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(clientDetails)
+        body: JSON.stringify(pushSubcription)
       })
 
       const json = await response.json()

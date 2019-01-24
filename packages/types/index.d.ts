@@ -157,7 +157,8 @@ declare module '@walletconnect/types' {
     push?: IPushServerOptions
   }
 
-  export interface IClientDetails {
+  export interface IPushSubscription {
+    topic: string
     type: string
     token: string
     peerName: string
