@@ -218,9 +218,7 @@ class Connector {
     return this._peerId
   }
 
-  set clientMeta (value) {
-
-  }
+  set clientMeta (value) {}
 
   get clientMeta () {
     let clientMeta: IClientMeta | null = this._clientMeta
@@ -294,17 +292,13 @@ class Connector {
     return accounts
   }
 
-  set connected (value) {
-
-  }
+  set connected (value) {}
 
   get connected () {
     return this._connected
   }
 
-  set pending (value) {
-
-  }
+  set pending (value) {}
 
   get pending () {
     return !!this._handshakeTopic

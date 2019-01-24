@@ -143,4 +143,24 @@ declare module '@walletconnect/types' {
     uri?: string
     session?: IWalletConnectSession
   }
+
+  export interface IPushServerOptions {
+    url: string
+    type: string
+    token: string
+    peerMeta?: boolean
+    language?: string
+  }
+
+  export interface INativeWalletOptions {
+    clientMeta: IClientMeta
+    push?: IPushServerOptions
+  }
+
+  export interface IClientDetails {
+    type: string
+    token: string
+    peerName: string
+    language: string
+  }
 }
